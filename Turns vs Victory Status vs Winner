@@ -1,0 +1,73 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import sklearn as skl
+import matplotlib.pyplot as plt
+
+df
+dd=df.drop(['rated','id','increment_code','white_id','white_rating','black_id','black_rating','created_at','last_move_at','moves','opening_eco','opening_name','opening_ply'],axis=1)
+dd
+
+dd['winner'].value_counts()
+dd[dd['winner'] == 'black'].shape
+dd[dd['winner'] == 'white'].shape
+dd[(dd['winner'] == 'black') & (dd['victory_status'] == 'outoftime')].shape
+dd_white = dd[dd['winner'] == 'black']
+dd_white['victory_status'].value_counts()
+
+tt = dd[dd['turns'].astype(int)%2==0]
+tt.loc[tt.winner == 'white', 'newcol'] = 0
+tt.loc[tt.winner == 'black', 'newcol'] = 1
+tt.loc[tt.winner == 'draw', 'newcol'] = 2
+tt.loc[tt.victory_status == 'outoftime','newcol2'] = 0
+tt.loc[tt.victory_status == 'resign','newcol2'] = 1
+tt.loc[tt.victory_status == 'mate','newcol2'] = 2
+tt.loc[tt.victory_status == 'draw','newcol2'] = 3
+cond =  [tt['newcol'].eq(0) & tt['newcol2'].eq(0),
+         tt['newcol'].eq(0) & tt['newcol2'].eq(1),
+         tt['newcol'].eq(0) & tt['newcol2'].eq(2),
+         tt['newcol'].eq(1) & tt['newcol2'].eq(0),
+         tt['newcol'].eq(1) & tt['newcol2'].eq(1),
+         tt['newcol'].eq(1) & tt['newcol2'].eq(2), 
+         tt['newcol'].eq(2) & tt['newcol2'].eq(3),]
+       
+res = [1, 2, 3, 4, 5, 6, 7]
+t=tt['result'] = np.select(cond, res, default=np.nan)
+
+tx = sns.barplot(x="result", y="result", data=tt ,hue="result", estimator=lambda x: (len(x) / len(tt)) * 100 )
+tx.set(ylabel="Percent")
+tx.set(xlabel="Identifier")
+labels=['White, Outoftime','White, Resign','White, Mate','Black, Outoftime','Black, Resign','Black, Mate','Draw, Draw']
+h, l = tx.get_legend_handles_labels()
+tx.legend(h, labels, title="Identifiers",bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+tx.set_xticklabels(labels, rotation='vertical', fontsize=10)
+plt.show()
+
+
+xx= dd[~dd['turns'].astype(int)%2==0]
+xx.loc[xx.winner == 'white', 'newcol'] = 0
+xx.loc[xx.winner == 'black', 'newcol'] = 1
+xx.loc[xx.winner == 'draw', 'newcol'] = 2
+xx.loc[xx.victory_status == 'outoftime','newcol2'] = 0
+xx.loc[xx.victory_status == 'resign','newcol2'] = 1
+xx.loc[xx.victory_status == 'mate','newcol2'] = 2
+xx.loc[xx.victory_status == 'draw','newcol2'] = 3
+cond =  [xx['newcol'].eq(0) & xx['newcol2'].eq(0),
+         xx['newcol'].eq(0) & xx['newcol2'].eq(1),
+         xx['newcol'].eq(0) & xx['newcol2'].eq(2),
+         xx['newcol'].eq(1) & xx['newcol2'].eq(0),
+         xx['newcol'].eq(1) & xx['newcol2'].eq(1),
+         xx['newcol'].eq(1) & xx['newcol2'].eq(2), 
+         xx['newcol'].eq(2) & xx['newcol2'].eq(3),
+       ]
+res = [1, 2, 3, 4, 5, 6, 7]
+t1=xx['result'] = np.select(cond, res, default=np.nan)
+
+tx1 = sns.barplot(x="result", y="result", data=xx ,hue="result", estimator=lambda x: (len(x) / len(xx)) * 100 )
+tx1.set(ylabel="Percent")
+tx1.set(xlabel="Identifier")
+labels=['White, Outoftime','White, Resign','White, Mate','Black, Outoftime','Black, Resign','Black, Mate','Draw, Draw']
+h1, l2 = tx.get_legend_handles_labels()
+tx1.legend(h, labels, title="Identifiers",bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+tx1.set_xticklabels(labels, rotation='vertical', fontsize=10)
+plt.show()
