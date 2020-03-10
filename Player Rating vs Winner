@@ -1,0 +1,49 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import sklearn as skl
+import matplotlib.pyplot as plt
+
+df=pd.read_csv("games.csv")
+data=df.drop(['victory_status','id','rated','created_at','last_move_at','increment_code','white_id','black_id','moves','opening_ply','turns','opening_name','opening_eco'], axis=1)
+data
+
+data
+data.loc[data.white_rating > data.black_rating, 'newcol'] = 'white'
+data.loc[data.white_rating < data.black_rating, 'newcol'] = 'black'
+data.loc[data.white_rating == data.black_rating, 'newcol'] = 'draw'
+
+x=data.drop(['white_rating','black_rating'],axis=1)
+x
+cond =  [x['winner'].eq('white') & x['newcol'].eq('black'),
+         x['winner'].eq('white') & x['newcol'].eq('white'),
+         x['winner'].eq('white') & x['newcol'].eq('draw'),
+         x['winner'].eq('black') & x['newcol'].eq('black'),
+         x['winner'].eq('black') & x['newcol'].eq('white'),
+         x['winner'].eq('black') & x['newcol'].eq('draw'),
+         x['winner'].eq('draw') & x['newcol'].eq('black'),
+         x['winner'].eq('draw') & x['newcol'].eq('white')]
+res = [1, 2, 3, 4, 5, 6,7,8]
+
+x['result'] = np.select(cond, res, default=np.nan)
+
+#(x.loc[:,'result'] == 1).mean()
+#(x.loc[:,'result'] == 2).mean()
+#(x.loc[:,'result'] == 3).mean()
+#(x.loc[:,'result'] == 4).mean()
+#(x.loc[:,'result'] == 5).mean()
+(x.loc[:,'result'] == 6).mean()
+#(x.loc[:,'result'] == 7).mean()
+#(x.loc[:,'result'] == 8).mean()
+
+ax = sns.barplot(x="result", y="result", data=x,hue="result", estimator=lambda x: len(x) / len(df) * 100)
+ax.set(ylabel="Percent")
+ax.set(xlabel="Identifier")
+labels=['White ,Black', 'White, White','White, Draw','Black, Black','Draw, Draw','Black, White','Black, Draw','Draw, Black','Draw, White']
+h, l = ax.get_legend_handles_labels()
+ax.legend(h, labels, title="Identifiers")
+ax.set_xticklabels(labels, rotation='vertical', fontsize=10)
+plt.show()
+
+
+
