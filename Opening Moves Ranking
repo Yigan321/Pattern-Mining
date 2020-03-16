@@ -1,0 +1,27 @@
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import sklearn as skl
+import matplotlib.pyplot as plt
+from sklearn.metrics.pairwise import pairwise_distances
+
+
+item_similarity = pairwise_distances(recommendations.T.fillna(0), metric='cosine')
+#Matrx that shows how similar 1 opening move strategy is to another opening move strategy
+
+correction = np.array([np.abs(item_similarity).sum(axis=1)])
+item_predictions = recommendations.fillna(0).dot(item_similarity).apply(
+    lambda srs: srs / np.array([item_similarity.sum(axis=1)]).flatten(), axis='columns')
+    
+    #Generate predictions for each player take the dot product between the matrix divided by the sum of similar columns
+    
+recommended_opening_numbers = item_predictions.apply(
+lambda srs: np.argmax(srs.values), axis='columns'
+)
+recommended_opening_numbers.head()
+    
+#Shows which columns each user opening move recommendation
+
+recommended_openings.value_counts().head(20).iloc[1:].plot.bar(figsize=(24, 10), fontsize=22)
+
+#Graph recommendations
